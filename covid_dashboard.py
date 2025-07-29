@@ -31,11 +31,35 @@ confirmed_ts.index = pd.to_datetime(confirmed_ts.index, format="%m/%d/%y")
 st.sidebar.title("COVID-19 Dashboard")
 country = st.sidebar.selectbox("Select a country", confirmed_country.index)
 
-# --- Line Chart ---
+# --- Prepare Time Series ---
+deaths_ts = deaths_country.T
+deaths_ts.index = pd.to_datetime(deaths_ts.index, format="%m/%d/%y")
+
+# --- Combined Title ---
 st.title(f"COVID-19 Trend in {country}")
-fig = px.line(confirmed_ts, y=country, x=confirmed_ts.index, title=f"{country} - Confirmed Cases Over Time")
-st.plotly_chart(fig)
+
+# --- Confirmed Cases Line Chart ---
+fig_confirmed = px.line(
+    confirmed_ts,
+    y=country,
+    x=confirmed_ts.index,
+    title=f"{country} - Confirmed Cases Over Time",
+    labels={"value": "Confirmed Cases", "index": "Date"}
+)
+st.plotly_chart(fig_confirmed)
 st.metric("Total Confirmed Cases", int(confirmed_ts[country].iloc[-1]))
+
+# --- Deaths Line Chart ---
+fig_deaths = px.line(
+    deaths_ts,
+    y=country,
+    x=deaths_ts.index,
+    title=f"{country} - Deaths Over Time",
+    labels={"value": "Death Cases", "index": "Date"},
+    line_shape="linear"
+)
+st.plotly_chart(fig_deaths)
+st.metric("Total Death Cases", int(deaths_ts[country].iloc[-1]))
 
 # --- Global Trend Plot ---
 st.subheader("Global Confirmed Cases Over Time")
